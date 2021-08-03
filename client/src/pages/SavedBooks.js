@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
+import { useQuery, useMutation } from '@apollo/client';
 
-import { getMe, deleteBook } from '../utils/API';
+//import { getMe, deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
+
+import { GET_ME } from '../utils/queries';
+import { REMOVE_BOOK } from '../utils/mutations';
 
 /*
 Remove the `useEffect()` Hook that sets the state for `UserData`.
@@ -21,10 +25,11 @@ const SavedBooks = () => {
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
 
-  //const { x, data} = useQuery(GET_ME);
+  const { loading, data} = useQuery(GET_ME);
+  // The original getme in api.js is: return fetch('/api/users/me'
+  const [removeBook, { error }] = useMutation(REMOVE_BOOK);
 
-
-
+  /*
   useEffect(() => {
     const getUserData = async () => {
       try {
@@ -49,25 +54,37 @@ const SavedBooks = () => {
 
     getUserData();
   }, [userDataLength]);
+  */
+
+/*
+Use the `useMutation()` Hook to execute the `REMOVE_BOOK` mutation in the 
+`handleDeleteBook()` function instead of the `deleteBook()` function that's 
+imported from `API` file. (Make sure you keep the `removeBookId()` function 
+in place!)
+*/
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
+
+    /*
+    // in utils/mutation.js
+  mutation removeBook($bookId: bookId) {
+    removeBook(bookData: $bookData) {
+      _id
+      username
+
+    */
+
+    
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
       return false;
     }
 
-    /*
-    Use the `useMutation()` Hook to execute the `REMOVE_BOOK` mutation in the 
-    `handleDeleteBook()` function instead of the `deleteBook()` function that's 
-    imported from `API` file. (Make sure you keep the `removeBookId()` function in place!)
-      const [addComment, { error }] = useMutation(ADD_COMMENT);
-    */
-
-
     try {
       /*
+      // original code
       const response = await deleteBook(bookId, token);
 
       if (!response.ok) {
@@ -77,8 +94,11 @@ const SavedBooks = () => {
       const updatedUser = await response.json();
       setUserData(updatedUser);
       */
-      //const [addComment?, { error? }] = useMutation(REMOVE_BOOK);
-      // upon success, remove book's id from localStorage
+
+      const { userData } = await removeBook({
+        variables: { bookId },
+      });
+
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
@@ -87,9 +107,9 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
-    return <h2>LOADING...</h2>;
-  }
+//  if (!userDataLength) {
+//    return <h2>LOADING...</h2>;
+//  }
 
   return (
     <>
