@@ -76,10 +76,11 @@ const SearchBooks = () => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     try {
+      // see the useMutation about line 28
       const { data } = await saveBook({
         variables: { bookData: bookToSave},
       });
-      
+
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
