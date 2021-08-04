@@ -57,14 +57,6 @@ const SearchBooks = () => {
       console.error(err);
     }
   };
-  /*	
-  SearchBooks.js:
-    1. Use the Apollo useMutation() Hook to execute the `SAVE_BOOK` mutation in the 
-    handleSaveBook() function instead of the saveBook() function imported from 
-    the API file.
-    2. Make sure you keep the logic for saving the book's ID to state
-    in the `try...catch` block! 
-  */
 
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
@@ -76,7 +68,7 @@ const SearchBooks = () => {
 
     try {
       // see the useMutation about line 28
-      const { data } = await saveBook({
+      await saveBook({
         variables: { bookData: bookToSave},
       });
 

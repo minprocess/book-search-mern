@@ -9,73 +9,17 @@ import { removeBookId } from '../utils/localStorage';
 import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 
-/*
-Remove the `useEffect()` Hook that sets the state for `UserData`.
-
-Instead, use the `useQuery()` Hook to execute the `GET_ME` query on load and 
-save it to a variable named `userData`.
-
-Use the `useMutation()` Hook to execute the `REMOVE_BOOK` mutation in the `handleDeleteBook()` function instead of the `deleteBook()` function that's imported from `API` file. (Make sure you keep the `removeBookId()` function in place!)
-
-*/
-
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
-
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
 
   const { loading, data} = useQuery(GET_ME);
+  const userData = data ? data.me : {savedBooks:[]};
+
   // The original getme in api.js is: return fetch('/api/users/me'
   const [removeBook, { error }] = useMutation(REMOVE_BOOK);
 
-  /*
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const response = await getMe(token);
-
-        if (!response.ok) {
-          throw new Error('something went wrong!');
-        }
-
-        const user = await response.json();
-        setUserData(user);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    getUserData();
-  }, [userDataLength]);
-  */
-
-/*
-Use the `useMutation()` Hook to execute the `REMOVE_BOOK` mutation in the 
-`handleDeleteBook()` function instead of the `deleteBook()` function that's 
-imported from `API` file. (Make sure you keep the `removeBookId()` function 
-in place!)
-*/
-
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
-
-    /*
-    // in utils/mutation.js
-  mutation removeBook($bookId: bookId) {
-    removeBook(bookData: $bookData) {
-      _id
-      username
-
-    */
-
-    
+ 
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
@@ -83,19 +27,8 @@ in place!)
     }
 
     try {
-      /*
-      // original code
-      const response = await deleteBook(bookId, token);
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
-      */
-
-      const { userData } = await removeBook({
+      await removeBook({
         variables: { bookId },
       });
 
@@ -105,11 +38,6 @@ in place!)
     }
 
   };
-
-  // if data isn't here yet, say so
-//  if (!userDataLength) {
-//    return <h2>LOADING...</h2>;
-//  }
 
   return (
     <>
